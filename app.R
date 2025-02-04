@@ -51,7 +51,7 @@ server <- function(input, output, session) {
     req(input$datafile)
     tryCatch({
       data_rv$data <- read.csv(input$datafile$datapath)
-      data_rv$name <- input$datafile$name
+      data_rv$name <- "data"
       values$upload_state <- 'uploaded'
     }, error = function(e) {
       showNotification("Error reading CSV file", type = "error")
@@ -72,9 +72,9 @@ server <- function(input, output, session) {
   
   output$summary <- renderText({
     if (values$upload_state == 'uploaded') {
-      paste("Uploaded file:", data_rv$name)
+      paste("Uploaded file:", input$datafile$name)
     } else {
-      paste("Default file:", data_rv$name)
+      paste("Default file:", input$datafile$name)
     }
   })
   
@@ -90,6 +90,7 @@ server <- function(input, output, session) {
   
   output$cvd_plot <- renderPlot({
     req(input$cvd_check)  # Only render if checkbox is checked
+    data <- data_rv$data
     plot_code <- esquisse_out$code_plot
     
     if (!is.null(plot_code) && plot_code != "") {
@@ -98,7 +99,6 @@ server <- function(input, output, session) {
     }
   })
 }
-
 
   shinyApp(ui, server)
 
