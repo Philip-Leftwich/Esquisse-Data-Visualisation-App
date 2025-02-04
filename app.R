@@ -2,6 +2,7 @@ library(shiny)
 library(esquisse)
 library(colorBlindness)# For colorblind simulation
 library(ggplot2)
+library(plotly)
 
 ui <- fluidPage(
   theme = bs_theme_esquisse(),
