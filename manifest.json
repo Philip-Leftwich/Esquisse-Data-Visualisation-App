@@ -608,7 +608,7 @@
       }
     },
     "colorBlindness": {
-      "Source": "Bioconductor",
+      "Source": "CRAN",
       "Repository": "http://rspm/default/latest",
       "description": {
         "Package": "colorBlindness",
