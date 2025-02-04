@@ -1,6 +1,6 @@
 library(shiny)
 library(esquisse)
-library(colorBlindness)  # For colorblind simulation
+library(colorblindr)# For colorblind simulation
 library(ggplot2)
 
 ui <- fluidPage(
@@ -89,9 +89,11 @@ server <- function(input, output, session) {
   
   output$cvd_plot <- renderPlot({
     req(input$cvd_check)  # Only render if checkbox is checked
-    plot_obj <- esquisse_out$ggplot
-    if (!is.null(plot_obj)) {
-      cvdPlot(plot_obj)  
+    plot_code <- esquisse_out$code_plot
+    
+    if (!is.null(plot_code) && plot_code != "") {
+      plot_obj <- eval(parse(text = plot_code))  # Convert code to ggplot object
+      cvd_grid(plot_obj)        # Simulate Deuteranopia
     }
   })
 }
@@ -99,3 +101,4 @@ server <- function(input, output, session) {
 if (interactive()) {
   shinyApp(ui, server)
 }
+
