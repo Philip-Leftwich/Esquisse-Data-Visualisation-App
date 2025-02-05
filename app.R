@@ -74,7 +74,7 @@ server <- function(input, output, session) {
     if (values$upload_state == 'uploaded') {
       paste("Uploaded file:", input$datafile$name)
     } else {
-      paste("Default file:", input$datafile$name)
+      paste("Default file:", "Iris dataset - upload a file to use your own data")
     }
   })
   
