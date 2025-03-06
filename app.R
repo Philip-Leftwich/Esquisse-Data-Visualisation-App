@@ -5,18 +5,17 @@ library(ggplot2)
 library(plotly)
 
 ui <- fluidPage(
+  
   theme = bs_theme_esquisse(),
   
   tags$h1("Upload CSV and Visualize with Esquisse"),
   
-  uiOutput("file_input_ui"),  # Render file input dynamically
-  actionButton('reset', 'Reset Data'),
-  verbatimTextOutput("summary"),
+  
   
   checkboxGroupInput(
     inputId = "aes",
     label = "Aesthetics to use:",
-    choices = c("fill", "color", "size", "shape", "weight", "group", "facet", "facet_row", "facet_col"),
+    choices = c("fill", "color", "size", "shape", "weight", "group", "facet", "facet_row", "facet_col", "label"),
     selected = c("fill", "color", "size", "facet"),
     inline = TRUE
   ),
@@ -25,68 +24,32 @@ ui <- fluidPage(
   
   esquisse_ui(
     id = "esquisse",
-    header = FALSE,
+    header = esquisse_header(),
+    n_geoms = 4,
     container = esquisse_container(height = "700px")
   ),
   
-  tags$b("Output of the module:"),
-  verbatimTextOutput("out"),
   
   plotOutput("cvd_plot")  # New plot output
 )
 
 server <- function(input, output, session) {
+  
+  
   data_rv <- reactiveValues(data = iris, name = "iris")
   
-  output$file_input_ui <- renderUI({
-    fileInput('datafile', 'Choose CSV File',
-              accept = c('text/csv', 'text/comma-separated-values,text/plain', '.csv'))
-  })
-  
-  values <- reactiveValues(
-    upload_state = "default"
-  )
-  
-  observeEvent(input$datafile, {
-    req(input$datafile)
-    tryCatch({
-      data_rv$data <- read.csv(input$datafile$datapath)
-      data_rv$name <- "data"
-      values$upload_state <- 'uploaded'
-    }, error = function(e) {
-      showNotification("Error reading CSV file", type = "error")
-    })
-  })
-  
-  observeEvent(input$reset, {
-    data_rv$data <- iris  # Reset to default iris dataset
+  observeEvent(iris, {
+    data_rv$data <- iris
     data_rv$name <- "iris"
-    values$upload_state <- 'reset'
-    
-    # Re-render the file input to clear the uploaded file
-    output$file_input_ui <- renderUI({
-      fileInput('datafile', 'Choose CSV File',
-                accept = c('text/csv', 'text/comma-separated-values,text/plain', '.csv'))
-    })
   })
   
-  output$summary <- renderText({
-    if (values$upload_state == 'uploaded') {
-      paste("Uploaded file:", input$datafile$name)
-    } else {
-      paste("Default file:", "Iris dataset - upload a file to use your own data")
-    }
-  })
   
   esquisse_out <- esquisse_server(
     id = "esquisse",
+    n_geoms = 4,
     data_rv = data_rv,
-    default_aes = reactive(input$aes)
+    
   )
-  
-  output$out <- renderPrint({
-    str(reactiveValuesToList(esquisse_out), max.level = 1)
-  })
   
   output$cvd_plot <- renderPlot({
     req(input$cvd_check)  # Only render if checkbox is checked
@@ -98,8 +61,10 @@ server <- function(input, output, session) {
       cvdPlot(plot_obj)        # Simulate Deuteranopia
     }
   })
+  
+  
 }
 
-  shinyApp(ui, server)
+shinyApp(ui, server)
 
 
